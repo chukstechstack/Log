@@ -36,6 +36,21 @@ public final class SessionService {
     }
   }
 
+  public static String buildCookie(String name, String value, int maxAge, String sameSite) {
+    StringBuilder sb =
+        new StringBuilder(name)
+            .append('=')
+            .append(value)
+            .append("; Path=/; Max-Age=")
+            .append(maxAge)
+            .append("; HttpOnly; SameSite=")
+            .append(sameSite);
+    if (AuthConfig.cookieSecure()) {
+      sb.append("; Secure");
+    }
+    return sb.toString();
+  }
+
   private static String readCookie(HttpExchange exchange, String name) {
     List<String> cookieHeaders = exchange.getRequestHeaders().get("Cookie");
     if (cookieHeaders == null) {

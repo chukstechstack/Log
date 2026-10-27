@@ -3,7 +3,10 @@ C:\Users\HP\Documents\Apps\TypeMe\src\main\java\com\typeme\config\DatabaseConfig
 C:\Users\HP\Documents\Apps\TypeMe\src\main\java\com\typeme\config\SchemaInitializer.java
 C:\Users\HP\Documents\Apps\TypeMe\src\main\java\com\typeme\dao\SessionDao.java
 C:\Users\HP\Documents\Apps\TypeMe\src\main\java\com\typeme\dao\UserDao.java
-C:\Users\HP\Documents\Apps\TypeMe\src\main\java\com\typeme\handlers\GoogleAuthHandler.java
+C:\Users\HP\Documents\Apps\TypeMe\src\main\java\com\typeme\handlers\GoogleCallbackHandler.java
+C:\Users\HP\Documents\Apps\TypeMe\src\main\java\com\typeme\handlers\GoogleLoginHandler.java
+C:\Users\HP\Documents\Apps\TypeMe\src\main\java\com\typeme\handlers\LogoutHandler.java
+C:\Users\HP\Documents\Apps\TypeMe\src\main\java\com\typeme\handlers\SessionHandler.java
 C:\Users\HP\Documents\Apps\TypeMe\src\main\java\com\typeme\Main.java
 C:\Users\HP\Documents\Apps\TypeMe\src\main\java\com\typeme\models\User.java
 C:\Users\HP\Documents\Apps\TypeMe\src\main\java\com\typeme\services\SessionService.java

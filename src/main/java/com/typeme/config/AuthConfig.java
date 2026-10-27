@@ -6,22 +6,30 @@ import java.util.Locale;
 
 public final class AuthConfig {
   private static final String DEFAULT_FRONTEND_ORIGIN = "http://localhost:4200";
+
   private static final Duration SESSION_TTL = Duration.ofHours(12);
 
   private static final String GOOGLE_CLIENT_ID = System.getenv("GOOGLE_CLIENT_ID");
+
   private static final String GOOGLE_CLIENT_SECRET = System.getenv("GOOGLE_CLIENT_SECRET");
+
   private static final String GOOGLE_REDIRECT_URI =
-      environmentOrDefault(
-          "GOOGLE_REDIRECT_URI", "http://localhost:7070/auth/google/callback");
+      environmentOrDefault("GOOGLE_REDIRECT_URI", "http://localhost:7070/auth/google/callback");
+
   private static final String FRONTEND_ORIGIN =
       normalizeOrigin(environmentOrDefault("FRONTEND_ORIGIN", DEFAULT_FRONTEND_ORIGIN));
+
   private static final boolean COOKIE_SECURE =
       Boolean.parseBoolean(
           environmentOrDefault(
-              "SESSION_COOKIE_SECURE", GOOGLE_REDIRECT_URI.startsWith("https://") ? "true" : "false"));
+              "SESSION_COOKIE_SECURE",
+              GOOGLE_REDIRECT_URI.startsWith("https://") ? "true" : "false"));
+
   private static final String COOKIE_SAME_SITE =
       environmentOrDefault("SESSION_COOKIE_SAME_SITE", "Lax");
+
   private static final String COOKIE_NAME = COOKIE_SECURE ? "__Host-session_id" : "session_id";
+
   private static final String STATE_COOKIE_NAME =
       COOKIE_SECURE ? "__Host-oauth_state" : "oauth_state";
 
@@ -29,10 +37,11 @@ public final class AuthConfig {
     if (!COOKIE_SAME_SITE.equalsIgnoreCase("Lax")
         && !COOKIE_SAME_SITE.equalsIgnoreCase("Strict")
         && !COOKIE_SAME_SITE.equalsIgnoreCase("None")) {
-      throw new IllegalStateException(
-          "SESSION_COOKIE_SAME_SITE must be Lax, Strict, or None");
+      throw new IllegalStateException("SESSION_COOKIE_SAME_SITE must be Lax, Strict, or None");
     }
+
     if (COOKIE_SAME_SITE.equalsIgnoreCase("None") && !COOKIE_SECURE) {
+
       throw new IllegalStateException(
           "SESSION_COOKIE_SECURE must be true when SESSION_COOKIE_SAME_SITE is None");
     }
@@ -83,11 +92,13 @@ public final class AuthConfig {
 
   private static String normalizeOrigin(String value) {
     URI uri;
+
     try {
       uri = URI.create(value);
     } catch (IllegalArgumentException e) {
       throw new IllegalStateException("FRONTEND_ORIGIN must be a valid HTTP(S) origin", e);
     }
+
     if (!("http".equalsIgnoreCase(uri.getScheme()) || "https".equalsIgnoreCase(uri.getScheme()))
         || uri.getHost() == null
         || uri.getUserInfo() != null
