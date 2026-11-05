@@ -12,6 +12,4 @@ if not defined GOOGLE_CLIENT_SECRET (
 )
 
 echo [TypeMe] Starting Backend Server via Maven...
-mvn compile exec:java
-
-pause
+mvn compile exec:j

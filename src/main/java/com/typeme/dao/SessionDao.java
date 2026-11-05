@@ -16,8 +16,7 @@ public final class SessionDao {
 
   public static void create(int userId, String tokenHash, Instant expiresAt) throws SQLException {
     String cleanupSql = "DELETE FROM sessions WHERE expires_at <= CURRENT_TIMESTAMP";
-    String insertSql =
-        "INSERT INTO sessions (id, user_id, expires_at) VALUES (?, ?, ?)";
+    String insertSql = "INSERT INTO sessions (id, user_id, expires_at) VALUES (?, ?, ?)";
 
     try (Connection connection = DatabaseConfig.getConnection()) {
       try (PreparedStatement cleanup = connection.prepareStatement(cleanupSql)) {
