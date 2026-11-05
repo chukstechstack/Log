@@ -1,53 +1,72 @@
-# TypeMe backend
+# Log — Keep the moments that move you
 
-## Google OAuth and sessions
+The room is quiet. A lecture is still playing in one tab; a line worth keeping
+arrives in another. Tomorrow, the thought may be gone. Log begins at that small,
+familiar moment: capture what matters, give it a home, and find it again when the
+next idea needs it.
 
-Configure these values in the backend's environment. Keep secrets in the hosting
-provider's secret/environment-variable settings, not in source files:
+## The story Log is building
 
-| Variable | Required | Local default / purpose |
-| --- | --- | --- |
-| `GOOGLE_CLIENT_ID` | Yes | Google OAuth client ID |
-| `GOOGLE_CLIENT_SECRET` | Yes | Google OAuth client secret |
-| `GOOGLE_REDIRECT_URI` | For cloud | Defaults to `http://localhost:7070/auth/google/callback`; register the exact value in Google Cloud |
-| `FRONTEND_ORIGIN` | For cloud | Defaults to `http://localhost:4200`; must be the frontend origin only, e.g. `https://app.example.com` |
-| `SESSION_COOKIE_SECURE` | For cloud | Defaults to true when the OAuth redirect URI is HTTPS; set to `true` behind HTTPS |
-| `SESSION_COOKIE_SAME_SITE` | If cross-site | Defaults to `Lax`; use `None` for a frontend and API on different sites, and require `SESSION_COOKIE_SECURE=true` |
-| `DATABASE_URL` | For cloud | JDBC URL; defaults to `jdbc:postgresql://localhost:5433/typeme_db` |
-| `DATABASE_USER` | If needed | PostgreSQL user; local default is `typeme_user` |
-| `DATABASE_PASSWORD` | For cloud | PostgreSQL password; local default is `typeme_password` |
-| `PORT` | If needed | HTTP port; defaults to `7070` |
+Log is imagined as a personal archive for learners, researchers, and curious
+people. A note can live beside the message, lesson, or audio that inspired it.
+Topics and tags bring order without breaking the flow. In time, alarms can bring
+a useful recording back at just the right hour, and a workspace can gather
+writing, media, and small study tools in one place.
 
-Register the exact `GOOGLE_REDIRECT_URI` as an authorized redirect URI for the
-same Google OAuth client. For local development, start PostgreSQL with
-`docker compose up -d`, set the Google variables in the same PowerShell window,
-then run `mvn compile exec:java`.
+The guiding idea in the Log Manifesto is local-first ownership: your notes and
+media should belong to you, remain useful offline, and be shareable or synced on
+your terms. Google sign-in gives the current service an identity; the longer
+vision keeps the personal archive in the user's hands.
 
-The backend creates opaque, randomly generated session tokens. It sends the
-token only in an `HttpOnly` cookie and stores only its SHA-256 hash in PostgreSQL.
-Sessions expire after 12 hours. Because session data is in the shared database,
-multiple backend instances can validate the same session; in-memory or sticky
-sessions are not required. The session table is cleaned of expired entries at
-login. Startup creates/migrates the required schema without dropping user or
-session data.
+## Where the camera is today
 
-The frontend must send credentialed requests to the backend:
+The current working application is an early Java backend. It provides Google
+OAuth sign-in, PostgreSQL-backed user and session handling, and HTTP endpoints
+for login, session lookup, logout, and health checks. The Angular, desktop, and
+mobile experiences, personal-drive sync, alarms, and media-rich editor described
+in the manifesto are future direction—not features claimed as complete here.
 
+## Run the backend locally
+
+Requirements: JDK 25, Maven, and Docker Compose.
+
+From PowerShell, move into `backend`, provide your own local database password
+and Google OAuth credentials as environment variables, then start PostgreSQL
+and the server:
+
+```powershell
+cd backend
+$env:DATABASE_PASSWORD = Read-Host "Local PostgreSQL password"
+$env:GOOGLE_CLIENT_ID = Read-Host "Google OAuth client ID"
+$env:GOOGLE_CLIENT_SECRET = Read-Host "Google OAuth client secret"
+docker compose up -d
+mvn compile exec:java
+```
+
+The default callback URL is
+`http://localhost:7070/auth/google/callback`; register it with the same Google
+OAuth client. Configure `GOOGLE_REDIRECT_URI`, `FRONTEND_ORIGIN`,
+`SESSION_COOKIE_SECURE`, `SESSION_COOKIE_SAME_SITE`, `DATABASE_URL`,
+`DATABASE_USER`, and `PORT` through the environment when your setup needs
+different values. The backend defaults to database `typeme_db`, user
+`typeme_user`, and port `7070`; `DATABASE_PASSWORD` is required and has no
+source-code default.
+
+Keep all real credentials in your environment or a secret manager, never in
+tracked files. The repository ignores `.env` files, private-key files, Java
+build output, and common frontend-generated files. If a real credential was
+ever committed or shared, rotate it; ignore rules do not erase Git history.
+
+## Sign-in and session endpoints
+
+- `GET /auth/google` starts Google sign-in.
 - `GET /auth/session` returns the signed-in user's public profile or `401`.
-- `POST /auth/logout` deletes the current session and clears its cookie. Send the
-  configured frontend origin; browsers do this for normal frontend `fetch` calls.
-- Use `credentials: "include"` for both calls.
-- Start login by navigating the browser to `GET /auth/google`.
-- New backend handlers that protect user data must call
-  `SessionService.getCurrentUser(exchange)` and reject a `null` result before
-  returning protected data.
+- `POST /auth/logout` ends the current session and clears its cookie.
+- `GET /health` checks that the backend is running.
 
-If frontend and API are on different subdomains of the same site, `SameSite=Lax`
-usually works, but requests still need CORS credentials. If they are on different
-sites, use `SESSION_COOKIE_SAME_SITE=None` and HTTPS (`SESSION_COOKIE_SECURE=true`).
-The app allows credentialed CORS only from the exact `FRONTEND_ORIGIN`.
-Some browsers block third-party cookies even with `SameSite=None`; hosting the API
-under the frontend's site or proxying it through the same site is more reliable.
-
-Use HTTPS in production, keep OAuth credentials and database credentials in the
-host's secret store, and rotate any credentials that have been exposed.
+Session tokens are random and opaque. The backend sends them only in an
+`HttpOnly` cookie and stores their SHA-256 hashes in PostgreSQL. Sessions expire
+after 12 hours. Credentialed browser requests should use
+`credentials: "include"`; the backend accepts them only from the exact
+`FRONTEND_ORIGIN`. Use HTTPS in production, with secure cookies and credentials
+stored in the hosting provider's secret store.

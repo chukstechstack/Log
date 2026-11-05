@@ -1,9 +1,0 @@
-com\typeme\config\SchemaInitializer.class
-com\typeme\dao\UserDao.class
-com\typeme\Main$1.class
-com\typeme\services\SessionService.class
-com\typeme\models\User.class
-com\typeme\Main.class
-com\typeme\config\DatabaseConfig.class
-com\typeme\dao\SessionDao.class
-com\typeme\config\AuthConfig.class

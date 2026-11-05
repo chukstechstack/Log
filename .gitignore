@@ -1,0 +1,24 @@
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*credentials*.json
+*secrets*.json
+
+# Java and Maven output
+**/target/
+*.class
+
+# Frontend dependencies and generated output
+**/node_modules/
+**/dist/
+**/.angular/
+
+# Local logs and operating-system files
+*.log
+Thumbs.db
+.DS_Store

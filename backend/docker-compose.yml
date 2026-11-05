@@ -5,7 +5,7 @@ services:
     container_name: typeme_db
     environment:
       POSTGRES_USER: typeme_user
-      POSTGRES_PASSWORD: typeme_password
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD:?Set DATABASE_PASSWORD in the environment}
       POSTGRES_DB: typeme_db
     ports:
       - "5433:5432"

@@ -8,8 +8,7 @@ public class DatabaseConfig {
   private static final String URL =
       environmentOrDefault("DATABASE_URL", "jdbc:postgresql://localhost:5433/typeme_db");
   private static final String USER = environmentOrDefault("DATABASE_USER", "typeme_user");
-  private static final String PASSWORD =
-      environmentOrDefault("DATABASE_PASSWORD", "typeme_password");
+  private static final String PASSWORD = requiredEnvironment("DATABASE_PASSWORD");
 
   public static Connection getConnection() throws SQLException {
     try {
@@ -23,5 +22,13 @@ public class DatabaseConfig {
   private static String environmentOrDefault(String name, String defaultValue) {
     String value = System.getenv(name);
     return value == null || value.isBlank() ? defaultValue : value.trim();
+  }
+
+  private static String requiredEnvironment(String name) {
+    String value = System.getenv(name);
+    if (value == null || value.isBlank()) {
+      throw new IllegalStateException(name + " must be set in the environment");
+    }
+    return value.trim();
   }
 }
