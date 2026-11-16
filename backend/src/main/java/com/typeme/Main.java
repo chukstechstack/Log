@@ -9,7 +9,9 @@ import com.typeme.config.DatabaseConfig;
 import com.typeme.config.SchemaInitializer;
 import com.typeme.handlers.GoogleCallbackHandler;
 import com.typeme.handlers.GoogleLoginHandler;
+import com.typeme.handlers.LoginHandler;
 import com.typeme.handlers.LogoutHandler;
+import com.typeme.handlers.RegisterHandler;
 import com.typeme.handlers.SessionHandler;
 //
 import java.io.IOException;
@@ -47,7 +49,7 @@ public class Main {
           @Override
           public void handle(HttpExchange exchange) throws IOException {
 
-            String response = "TypeMe Backend is running!";
+            String response = "Log Backend is running!";
 
             exchange.sendResponseHeaders(200, response.getBytes().length);
             OutputStream os = exchange.getResponseBody();
@@ -60,12 +62,14 @@ public class Main {
     // Separated Auth and Session endpoints
     server.createContext("/auth/google", new GoogleLoginHandler());
     server.createContext("/auth/google/callback", new GoogleCallbackHandler());
+    server.createContext("/auth/register", new RegisterHandler());
+    server.createContext("/auth/login", new LoginHandler());
     server.createContext("/auth/session", new SessionHandler());
     server.createContext("/auth/logout", new LogoutHandler());
 
     server.setExecutor(null);
     server.start();
 
-    System.out.println("[Server] TypeMe HTTP server started on port http://localhost:" + port);
+    System.out.println("[Server] Log HTTP server started on port http://localhost:" + port);
   }
 }

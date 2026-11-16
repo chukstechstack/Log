@@ -2,15 +2,15 @@ version: '3.8'
 services:
   postgres:
     image: postgres:15-alpine
-    container_name: typeme_db
+    container_name: log_db
     environment:
-      POSTGRES_USER: typeme_user
+      POSTGRES_USER: log_user
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD:?Set DATABASE_PASSWORD in the environment}
-      POSTGRES_DB: typeme_db
+      POSTGRES_DB: log_db
     ports:
       - "5433:5432"
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - log_pgdata:/var/lib/postgresql/data
 
 volumes:
-  pgdata:
+  log_pgdata:

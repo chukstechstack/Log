@@ -8,14 +8,19 @@ import com.typeme.config.AuthConfig;
 import com.typeme.models.User;
 import com.typeme.services.SessionService;
 import java.io.IOException;
+import java.sql.SQLException;
 
 public class SessionHandler implements HttpHandler {
   private static final ObjectMapper JSON_MAPPER = new ObjectMapper();
 
   @Override
   public void handle(HttpExchange exchange) throws IOException {
+    AuthHandlerSupport.addCorsHeaders(exchange);
+    if (AuthHandlerSupport.handleOptions(exchange, "GET")) {
+      return;
+    }
     if (!"GET".equalsIgnoreCase(exchange.getRequestMethod())) {
-      exchange.getResponseHeaders().set("Allow", "GET");
+      exchange.getResponseHeaders().set("Allow", "GET, OPTIONS");
       exchange.sendResponseHeaders(405, -1);
       return;
     }
@@ -44,8 +49,9 @@ public class SessionHandler implements HttpHandler {
       exchange.getResponseHeaders().set("Content-Type", "application/json; charset=utf-8");
       exchange.sendResponseHeaders(200, bytes.length);
       exchange.getResponseBody().write(bytes);
-    } catch (Exception e) {
-      exchange.sendResponseHeaders(500, -1);
+    } catch (SQLException e) {
+      System.err.println("[Auth Session] Database error (SQLState " + e.getSQLState() + ")");
+      AuthHandlerSupport.sendError(exchange, 500, "Unable to retrieve session");
     }
   }
 }

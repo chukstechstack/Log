@@ -21,8 +21,9 @@ vision keeps the personal archive in the user's hands.
 ## Where the camera is today
 
 The current working application is an early Java backend. It provides Google
-OAuth sign-in, PostgreSQL-backed user and session handling, and HTTP endpoints
-for login, session lookup, logout, and health checks. The Angular, desktop, and
+OAuth sign-in and email/password registration and login, PostgreSQL-backed user
+and session handling, and HTTP endpoints for session lookup, logout, and health
+checks. The Angular, desktop, and
 mobile experiences, personal-drive sync, alarms, and media-rich editor described
 in the manifesto are future direction—not features claimed as complete here.
 
@@ -48,8 +49,8 @@ The default callback URL is
 OAuth client. Configure `GOOGLE_REDIRECT_URI`, `FRONTEND_ORIGIN`,
 `SESSION_COOKIE_SECURE`, `SESSION_COOKIE_SAME_SITE`, `DATABASE_URL`,
 `DATABASE_USER`, and `PORT` through the environment when your setup needs
-different values. The backend defaults to database `typeme_db`, user
-`typeme_user`, and port `7070`; `DATABASE_PASSWORD` is required and has no
+different values. The backend defaults to database `log_db`, user
+`log_user`, and port `7070`; `DATABASE_PASSWORD` is required and has no
 source-code default.
 
 Keep all real credentials in your environment or a secret manager, never in
@@ -59,6 +60,11 @@ ever committed or shared, rotate it; ignore rules do not erase Git history.
 
 ## Sign-in and session endpoints
 
+- `POST /auth/register` accepts `{"email":"...","name":"...","password":"..."}`.
+  Name is optional; passwords must be 12–1024 characters. Successful signup
+  creates a session and returns the signed-in user's public profile.
+- `POST /auth/login` accepts `{"email":"...","password":"..."}` and creates a
+  session on success.
 - `GET /auth/google` starts Google sign-in.
 - `GET /auth/session` returns the signed-in user's public profile or `401`.
 - `POST /auth/logout` ends the current session and clears its cookie.
@@ -70,3 +76,8 @@ after 12 hours. Credentialed browser requests should use
 `credentials: "include"`; the backend accepts them only from the exact
 `FRONTEND_ORIGIN`. Use HTTPS in production, with secure cookies and credentials
 stored in the hosting provider's secret store.
+
+The backend Java package is `com.log`, and the default Docker container and
+PostgreSQL database are named `log_db`. A new `log_pgdata` volume is used so
+existing `typeme` database data is left untouched; migrate/export that data
+separately if it needs to be retained in the renamed database.

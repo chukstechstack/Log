@@ -4,6 +4,7 @@ import com.typeme.config.DatabaseConfig;
 import com.typeme.models.User;
 import java.sql.*;
 import java.time.LocalDateTime;
+import java.util.Locale;
 
 public class UserDao {
 
@@ -41,6 +42,53 @@ public class UserDao {
       }
     }
     throw new SQLException("Failed to find or create user for google_id: " + googleId);
+  }
+
+  public static User createLocalUser(String email, String name, String passwordHash)
+      throws SQLException {
+    String sql =
+        "INSERT INTO users (email, name, password_hash) VALUES (?, ?, ?) RETURNING "
+            + "id, google_id, email, name, avatar_url, is_admin, created_at";
+    try (Connection conn = DatabaseConfig.getConnection();
+        PreparedStatement statement = conn.prepareStatement(sql)) {
+      statement.setString(1, normalizeEmail(email));
+      statement.setString(2, name);
+      statement.setString(3, passwordHash);
+      try (ResultSet rs = statement.executeQuery()) {
+        if (rs.next()) {
+          return mapRowToUser(rs);
+        }
+      }
+    }
+    throw new SQLException("Failed to create local user");
+  }
+
+  public static String findPasswordHashByEmail(String email) throws SQLException {
+    String sql = "SELECT password_hash FROM users WHERE email = ?";
+    try (Connection conn = DatabaseConfig.getConnection();
+        PreparedStatement statement = conn.prepareStatement(sql)) {
+      statement.setString(1, normalizeEmail(email));
+      try (ResultSet rs = statement.executeQuery()) {
+        return rs.next() ? rs.getString("password_hash") : null;
+      }
+    }
+  }
+
+  public static User findByEmail(String email) throws SQLException {
+    String sql =
+        "SELECT id, google_id, email, name, avatar_url, is_admin, created_at FROM users WHERE "
+            + "email = ?";
+    try (Connection conn = DatabaseConfig.getConnection();
+        PreparedStatement statement = conn.prepareStatement(sql)) {
+      statement.setString(1, normalizeEmail(email));
+      try (ResultSet rs = statement.executeQuery()) {
+        return rs.next() ? mapRowToUser(rs) : null;
+      }
+    }
+  }
+
+  private static String normalizeEmail(String email) {
+    return email.trim().toLowerCase(Locale.ROOT);
   }
 
   private static User mapRowToUser(ResultSet rs) throws SQLException {

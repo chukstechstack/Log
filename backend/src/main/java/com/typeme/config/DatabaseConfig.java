@@ -6,8 +6,8 @@ import java.sql.SQLException;
 
 public class DatabaseConfig {
   private static final String URL =
-      environmentOrDefault("DATABASE_URL", "jdbc:postgresql://localhost:5433/typeme_db");
-  private static final String USER = environmentOrDefault("DATABASE_USER", "typeme_user");
+      environmentOrDefault("DATABASE_URL", "jdbc:postgresql://localhost:5433/log_db");
+  private static final String USER = environmentOrDefault("DATABASE_USER", "log_user");
   private static final String PASSWORD = requiredEnvironment("DATABASE_PASSWORD");
 
   public static Connection getConnection() throws SQLException {

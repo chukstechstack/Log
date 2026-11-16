@@ -22,7 +22,7 @@ mvn compile exec:java
 Usage: Projects with multiple main entry points | Function: Executes targeted main class via fully qualified package path.
 
 Bash
-mvn exec:java -Dexec.mainClass="com.typeme.Main"
+mvn exec:java -Dexec.mainClass="com.log.Main"
 
 5. Check Maven Version
 Usage: Verify installation and versions | Function: Outputs active Maven version and JDK info.
@@ -42,7 +42,7 @@ docker compose up -d
 Usage: Boot existing turned-off container | Function: Starts target container by name without rebuilding.
 
 Bash
-docker start typeme_db
+docker start log_db
 
 8. List All Docker Containers
 Usage: Inspect active and inactive containers | Function: Displays status list of all local containers (-a).
